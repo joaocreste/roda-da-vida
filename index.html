@@ -203,22 +203,27 @@ function atualizarGrafico() {
     indice += grupo.dimensoes.length;
   });
 
-  Plotly.newPlot("grafico", [trace], {
-    polar: {
-      radialaxis: {
-        range: [0, 10],
-        tickfont: { size: 10 },
-        gridcolor: "#ccc"
-      },
-      angularaxis: {
-        tickfont: { size: 10 }
-      }
-    },
-    shapes,
-    annotations,
-    showlegend: false,
-    margin: { t: 40, b: 40, l: 40, r: 40 }
-  });
+const traces = rodas.map(r => ({
+  type: "scatterpolar",
+  r: [...r.valores, r.valores[0]],
+  theta: [...dimensoes, dimensoes[0]],
+  fill: "toself",
+  opacity: 0.35,
+  line: { width: 2 },
+  name: r.nome
+}));
+
+Plotly.newPlot("grafico", traces, {
+  polar: {
+    radialaxis: {
+      range: [0, 10],
+      gridcolor: "#ccc"
+    }
+  },
+  shapes,
+  annotations,
+  showlegend: true
+});
 }
 
 /* =====================================================
@@ -239,6 +244,64 @@ function exportarPNG() {
 }
 
 atualizarGrafico();
+</script>
+
+<script>
+/* =====================================================
+   RODAS (MÚLTIPLAS AVALIAÇÕES)
+===================================================== */
+
+let rodas = [];
+
+/* =====================================================
+   ADICIONAR RODA
+===================================================== */
+function adicionarRoda() {
+  const nome = document.getElementById("nomeRoda").value.trim();
+  if (!nome) {
+    alert("Informe o nome da roda.");
+    return;
+  }
+
+  const valores = [...document.querySelectorAll("#formulario input")]
+    .map(i => Number(i.value));
+
+  rodas.push({ nome, valores });
+
+  document.getElementById("nomeRoda").value = "";
+  atualizarListaRodas();
+  atualizarGrafico();
+}
+
+/* =====================================================
+   REMOVER RODA
+===================================================== */
+function removerRoda(index) {
+  rodas.splice(index, 1);
+  atualizarListaRodas();
+  atualizarGrafico();
+}
+
+/* =====================================================
+   LISTA VISUAL
+===================================================== */
+function atualizarListaRodas() {
+  const lista = document.getElementById("listaRodas");
+  lista.innerHTML = "";
+
+  rodas.forEach((r, i) => {
+    const div = document.createElement("div");
+    div.style.display = "flex";
+    div.style.justifyContent = "space-between";
+    div.style.marginTop = "6px";
+
+    div.innerHTML = `
+      <span>${r.nome}</span>
+      <button onclick="removerRoda(${i})">Remover</button>
+    `;
+    lista.appendChild(div);
+  });
+}
 </script>
 
 </body>
