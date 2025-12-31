@@ -138,7 +138,12 @@ dimensoes.forEach(nome => {
    RODAS (MÚLTIPLAS AVALIAÇÕES)
 ===================================================== */
 
-let rodas = [];
+let rodas = [
+  {
+    nome: "Baseline",
+    valores: Array(dimensoes.length).fill(5)
+  }
+];
 
 function adicionarRoda() {
   const nome = document.getElementById("nomeRoda").value.trim();
